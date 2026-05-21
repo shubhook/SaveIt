@@ -1,1 +1,1 @@
-Web App that let's store links, articles, blogs to review later
+A personal reading hub for collecting and organizing articles, blogs, and links for later review. 
