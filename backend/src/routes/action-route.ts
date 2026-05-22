@@ -2,9 +2,6 @@ import { Router } from "express";
 import { addContent, deleteContent, getAllContent, getContent, getSharedContent, shareContent } from "../controllers/action-controller";
 import { asyncHandler } from "../utils/async-handler";
 import { requireAuth } from "../utils/auth";
-import { getPrismaClient } from "@prisma/client/runtime/client";
-import { act } from "react";
-import { getLineAndCharacterOfPosition } from "typescript";
 
 export const actionRouter = Router();
 

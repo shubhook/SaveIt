@@ -2,8 +2,6 @@ import type { Request, Response } from "express";
 import { ContentSchema, updateContentSchema } from "../types/action-schema";
 import { prisma } from "../db"
 import crypto from 'crypto';
-import { parse } from "path";
-import { sha } from "bun";
 
 
 export async function addContent(req: Request, res: Response): Promise<void> {
