@@ -25,7 +25,7 @@ export async function signup(req: Request, res: Response) {
             }
         });
 
-        res.status(211).json({
+        res.status(201).json({
             message: "User Created",
             token: generateToken({ userId: user.id }),
             username
