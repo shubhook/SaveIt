@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { ContentSchema } from "../types/action-schema";
+import { ContentSchema, deleteContentSchema } from "../types/action-schema";
 import { prisma } from "../db"
 
 
@@ -89,6 +89,68 @@ export async function getAllContent(req: Request, res: Response): Promise<void> 
         console.log(err);
         res.status(500).json({
             message: "cannot fetch content"
+        });
+    }
+}
+
+export async function getContent(req: Request, res: Response): Promise<void> {
+    const contentId: number = parseInt(req.params.contentId as string);
+
+    try {
+        const content = await prisma.content.findUnique({
+            where: {
+                id: contentId,
+                userId: req.userId
+            }
+        });
+
+        if(content == null) {
+            res.status(404).json({
+                message: `Invalid contentId: ${contentId}`
+            });
+            return;
+        }
+
+        res.status(200).json({
+            content
+        });
+
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({
+            message: `cannot fetch content, id: ${contentId}`
+        });
+    }
+}
+
+export async function updateContent(req: Request, res: Response): Promise<void> {
+    const parsedBody = deleteContentSchema.safeParse(req.body);
+    const contentId: number = parseInt(req.params.contentId as string);
+
+    if(!parsedBody.success) {
+        console.log(parsedBody.error);
+        res.status(400).json({
+            message: "validation error"
+        });
+        return;
+    }
+
+    const { tags, title, description, link, type } = parsedBody.data!;
+
+    try {
+        const response = await prisma.content.update({
+            where: { id: contentId, userId: req.userId },
+            data: parsedBody.data,
+        });
+
+        res.status(200).json({
+            message: "succes",
+            updatedData: response,
+        });
+        
+    } catch(err) {
+        res.status(500).json({
+            message: `cannot delete content, id; ${contentId}`
         });
     }
 }
