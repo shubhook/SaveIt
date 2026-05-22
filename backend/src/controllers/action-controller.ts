@@ -1,6 +1,9 @@
 import type { Request, Response } from "express";
 import { ContentSchema, updateContentSchema } from "../types/action-schema";
 import { prisma } from "../db"
+import crypto from 'crypto';
+import { parse } from "path";
+import { sha } from "bun";
 
 
 export async function addContent(req: Request, res: Response): Promise<void> {
@@ -150,5 +153,66 @@ export async function updateContent(req: Request, res: Response): Promise<void> 
         res.status(500).json({
             message: `cannot delete content, id; ${contentId}`
         });
+    }
+}
+
+export async function shareContent(req: Request, res: Response): Promise<void> {
+    const hash = crypto.randomBytes(16).toString('hex');
+    const userId = req.userId!;
+    try {
+        const response = await prisma.shareable.create({
+            data: {
+                userId: userId,
+                hash: hash
+            }
+        });
+
+        res.status(201).json({
+            message: "link created",
+            hash
+        });
+
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({
+            message: 'cannot create shareable link'
+        });
+    }
+}
+
+export async function getSharedContent(req: Request, res: Response): Promise<void> {
+    const hash: string = req.params.hash as string;
+
+    try {
+        const shareable = await prisma.shareable.findFirst({
+            where: {
+                hash
+            }
+        });
+
+        if(shareable == null) {
+            res.status(404).json({
+                message: `NO such content found, hash: ${hash}`
+            });
+            return;
+        }
+
+        const userId = shareable.userId;
+
+        const content = await prisma.content.findMany({
+            where: {
+                userId: userId
+            }
+        });
+
+        res.status(200).json({
+            content
+        });
+
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({
+            message: 'cannot fetch shared content'
+        })
     }
 }
