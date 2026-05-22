@@ -8,7 +8,7 @@ export const ContentSchema = z.object({
     tags: z.array(z.enum(["productivity", "research"]).or(z.string())).optional()
 });
 
-export const deleteContentSchema = z.object({
+export const updateContentSchema = z.object({
     title: z.string().min(1, "title is required").max(65).optional(),
     description: z.string().optional(),
     link: z.string().min(1, "link is required").optional(),

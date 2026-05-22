@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { ContentSchema, deleteContentSchema } from "../types/action-schema";
+import { ContentSchema, updateContentSchema } from "../types/action-schema";
 import { prisma } from "../db"
 
 
@@ -124,7 +124,7 @@ export async function getContent(req: Request, res: Response): Promise<void> {
 }
 
 export async function updateContent(req: Request, res: Response): Promise<void> {
-    const parsedBody = deleteContentSchema.safeParse(req.body);
+    const parsedBody = updateContentSchema.safeParse(req.body);
     const contentId: number = parseInt(req.params.contentId as string);
 
     if(!parsedBody.success) {
@@ -134,8 +134,6 @@ export async function updateContent(req: Request, res: Response): Promise<void> 
         });
         return;
     }
-
-    const { tags, title, description, link, type } = parsedBody.data!;
 
     try {
         const response = await prisma.content.update({
